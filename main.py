@@ -16,9 +16,10 @@ client = commands.Bot(command_prefix=PREFIX)
 
 @client.event
 async def on_ready():
-    game = discord.Game("Type f!help for help!")
-    await client.change_presence(status=discord.Status.online,
-    activity=game)
+    await client.change_presence(
+        status=discord.Status.online,
+        activity=discord.Game("Type f!help for help!")
+        )
     print('We have logged in as {0.user}'.format(client))
 
 # Error handling
@@ -36,6 +37,7 @@ async def ping(ctx):
         ping = (time.monotonic() - before) * 1000
         await message.edit(content=f"Pong! Bot Latency`{int(ping)}ms` API Latency `{int(client.latency * 1000)}ms`")
         print(f'Ping {int(ping)}ms')
+
     except Exception as e:
         print(type(e), e)
 
@@ -45,21 +47,24 @@ async def search(ctx, *args):
         #print(args)
         args = '+'.join(args)
         print(args, ctx.author, ctx.guild.name)
+
         if len(args) < 1:
             await ctx.send('No arguments recieved! Try putting something after the command?')
             print('No arguments recieved! Try putting something after the command?')
             #raise ValueError('Empty args')
+
         else:  
             e = discord.Embed(title='Search', colour=discord.Colour.blue())
             e.set_footer(text='search on fancade.com/search')
             #e.description = '[test](https://google.com/)'
+
             URL = f'https://api.fancade.com/search?query={args}'
             page = r.get(URL)
             o = 'https://fancade.page.link/?ibi=com.martinmagni.fancade&isi=1280404080&apn=com.martinmagni.fancade&link=http://www.fancade.com/games/'
             #print(eval(page.content)['games'])
 
             g = eval(page.content)['games']
-            
+
             s = ''
             c = 0
             for i in g:
@@ -67,7 +72,7 @@ async def search(ctx, *args):
                 c+=1
                 if c >= 10:
                     break
-            
+
             if len(g) >= 1:
                 e.set_image(url=f'https://www.fancade.com/search/images/{g[0][0]}.jpg')
                 e.description = s
@@ -87,6 +92,7 @@ async def wiki(ctx, *args):
             await ctx.send('No arguments recieved! Try putting something after the command?')
             print('No arguments recieved! Try putting something after the command?')
             #raise ValueError('Empty args')
+
         else:
             args = '+'.join(args)
             URL = 'https://www.fancade.com/wiki/gollum/search?q=' + args
@@ -144,8 +150,11 @@ async def wiki(ctx, *args):
                     )
                     #print(dic['descs'][k])
                     e.set_footer(text='Read more at https://fancade.com/wiki')
-                    await ctx.send(f'{ctx.author.mention} {args} >> {t1}', embed=e)
+
+                    await ctx.send(f'{ctx.author.mention} {args} >> {t1}',
+                                    embed=e)
                     await message.delete()
+
     except AttributeError:
         await ctx.send('Nothing appropriate found...')
 
@@ -185,11 +194,11 @@ async def _help(ctx):
 async def on_message(message):
     if message.author == client.user:
         return
-  
+
     if isinstance(message.channel, discord.DMChannel):
         print(message)
         print(message.content)
-      
+
     await client.process_commands(message)
 
 
