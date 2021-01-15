@@ -137,23 +137,29 @@ async def wiki(ctx, *args):
                                             timeout=60.0, check=check)
                 except asyncio.TimeoutError:
                     await ctx.send(f"{ctx.author.mention} You didn't react...")
+                    await message.delete()
 
                 else:
                     k = [i for i in range(len(l)) if l[i] == str(reaction)][0]
                     t = dic['titles'][1][k]
                     t1 = dic['titles'][0][k]
-                    e = discord.Embed(
-                        title=t,
-                        url=t1,
-                        description=dic['descs'][k],
-                        colour=discord.Colour.blue()
-                    )
-                    #print(dic['descs'][k])
-                    e.set_footer(text='Read more at https://fancade.com/wiki')
+                    d = dic['descs'][k]
+                    if len(d) <= 10:
+                        await ctx.send(t1)
+                        await message.delete()
+                    else:
+                        e = discord.Embed(
+                            title=t,
+                            url=t1,
+                            description=d,
+                            colour=discord.Colour.blue()
+                        )
+                        #print(dic['descs'][k])
+                        e.set_footer(text='Read more at https://fancade.com/wiki')
 
-                    await ctx.send(f'{ctx.author.mention} {args} >> {t1}',
-                                    embed=e)
-                    await message.delete()
+                        await ctx.send(f'{ctx.author.mention} {args} >> {t1}',
+                                        embed=e)
+                        await message.delete()
 
     except AttributeError:
         await ctx.send('Nothing appropriate found...')
