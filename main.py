@@ -20,7 +20,7 @@ async def on_ready():
         status=discord.Status.online,
         activity=discord.Game("Type f!help for help!")
         )
-    print('We have logged in as {0.user}'.format(client))
+    print(f'We have logged in as {client.user}')
 
 # Error handling
 @client.event
@@ -31,58 +31,50 @@ async def on_command_error(ctx, error):
 # Ping
 @client.command(pass_context=True)
 async def ping(ctx):
-    try:
-        before = time.monotonic()
-        message = await ctx.send("Pong!")
-        ping = (time.monotonic() - before) * 1000
-        await message.edit(content=f"Pong! Bot Latency`{int(ping)}ms` API Latency `{int(client.latency * 1000)}ms`")
-        print(f'Ping {int(ping)}ms')
-
-    except Exception as e:
-        print(type(e), e)
+    before = time.monotonic()
+    message = await ctx.send("Pong!")
+    ping = (time.monotonic() - before) * 1000
+    await message.edit(content=f"Pong! Bot Latency`{int(ping)}ms` API Latency `{int(client.latency * 1000)}ms`")
+    print(f'Ping {int(ping)}ms')
 
 @client.command()
 async def search(ctx, *args):
-    try:
-        #print(args)
-        args = '+'.join(args)
-        print(args, ctx.author, ctx.guild.name)
+    #print(args)
+    args = '+'.join(args)
+    print(args, ctx.author, ctx.guild.name)
 
-        if len(args) < 1:
-            await ctx.send('No arguments recieved! Try putting something after the command?')
-            print('No arguments recieved! Try putting something after the command?')
-            #raise ValueError('Empty args')
+    if len(args) < 1:
+        await ctx.send('No arguments recieved! Try putting something after the command?')
+        print('No arguments recieved! Try putting something after the command?')
+        #raise ValueError('Empty args')
 
-        else:  
-            e = discord.Embed(title='Search', colour=discord.Colour.blue())
-            e.set_footer(text='search on fancade.com/search')
-            #e.description = '[test](https://google.com/)'
+    else:
+        e = discord.Embed(title='Search', colour=discord.Colour.blue())
+        e.set_footer(text='search on fancade.com/search')
+        #e.description = '[test](https://google.com/)'
 
-            URL = f'https://api.fancade.com/search?query={args}'
-            page = r.get(URL)
-            o = 'https://fancade.page.link/?ibi=com.martinmagni.fancade&isi=1280404080&apn=com.martinmagni.fancade&link=http://www.fancade.com/games/'
-            #print(eval(page.content)['games'])
+        URL = f'https://api.fancade.com/search?query={args}'
+        page = r.get(URL)
+        o = 'https://fancade.page.link/?ibi=com.martinmagni.fancade&isi=1280404080&apn=com.martinmagni.fancade&link=http://www.fancade.com/games/'
+        #print(eval(page.content)['games'])
 
-            g = eval(page.content)['games']
+        g = eval(page.content)['games']
 
-            s = ''
-            c = 0
-            for i in g:
-                s += f'• [{i[1]}]({o}{i[0]}) by {i[2]}\n'
-                c+=1
-                if c >= 10:
-                    break
+        s = ''
+        c = 0
+        for i in g:
+            s += f'• [{i[1]}]({o}{i[0]}) by {i[2]}\n'
+            c+=1
+            if c >= 10:
+                break
 
-            if len(g) >= 1:
-                e.set_image(url=f'https://www.fancade.com/search/images/{g[0][0]}.jpg')
-                e.description = s
-            else:
-                e.description = 'Nothing found'
-            #print(e)
-            await ctx.send(embed=e)
-    except Exception as e:
-        print(e)
-        await ctx.send('Report this error to the bot owner:' + str(e))
+        if len(g) >= 1:
+            e.set_image(url=f'https://www.fancade.com/search/images/{g[0][0]}.jpg')
+            e.description = s
+        else:
+            e.description = 'Nothing found'
+        #print(e)
+        await ctx.send(embed=e)
 
 @client.command(aliases=['doc'])
 async def wiki(ctx, *args):
@@ -98,9 +90,9 @@ async def wiki(ctx, *args):
             URL = 'https://www.fancade.com/wiki/gollum/search?q=' + args
             page = r.get(URL)
             soup = bs(page.content, 'html.parser')
-            
+
             results = soup.find(id='search-results')
-            
+
             links = results.find_all('a')
             titles = results.find_all('span', class_='text-bold')
             descs = results.find_all('div', class_='search-context')
@@ -109,7 +101,7 @@ async def wiki(ctx, *args):
                                 for link in links if link['href'][:14] != '/wiki/uploads/'],
                                 [title.text for title in titles if title.text[:8] != 'uploads/'] ],
                     'descs' :   [desc.text for desc in descs] }
-            
+
             if len(dic['titles'][1]) < 1:
                 await ctx.send('Nothing appropriate found...')
 
@@ -170,31 +162,26 @@ async def wiki(ctx, *args):
             await ctx.send(t1)
             await message.delete()
         else:
-            await ctx.send('Report this error to the bot owner:' + str(e))
-            print(type(e))
             raise e
 
 @client.command(pass_context=True, name='help')
 async def _help(ctx):
-    try:
-        embed = discord.Embed(
-            colour=discord.Colour.blue()
-        )
+    embed = discord.Embed(
+        colour=discord.Colour.blue()
+    )
 
-        embed.set_author(name='Help')
-        embed.add_field(name=f'{PREFIX}ping',
-                        value='Returns ping',
-                        inline=False)
-        embed.add_field(name=f'{PREFIX}search',
-                        value='Returns results by searching from fancade.com/search',
-                        inline=False)
-        embed.add_field(name=f'{PREFIX}wiki or {PREFIX}doc',
-                        value='Returns results by searching from fancade.com/wiki',
-                        inline=False)
+    embed.set_author(name='Help')
+    embed.add_field(name=f'{PREFIX}ping',
+                    value='Returns ping',
+                    inline=False)
+    embed.add_field(name=f'{PREFIX}search',
+                    value='Returns results by searching from fancade.com/search',
+                    inline=False)
+    embed.add_field(name=f'{PREFIX}wiki or {PREFIX}doc',
+                    value='Returns results by searching from fancade.com/wiki',
+                    inline=False)
 
-        await ctx.send(embed=embed)
-    except Exception as e:
-        print(e)
+    await ctx.send(embed=embed)
 
 @client.event
 async def on_message(message):
@@ -205,8 +192,12 @@ async def on_message(message):
         print(message)
         print(message.content)
 
-    await client.process_commands(message)
-
+    try:
+        await client.process_commands(message)
+    except Exception as e:
+        await message.channel.send('Report this error to the bot owner: ' + str(e))
+        print(type(e))
+        raise e
 
 keep_alive.keep_alive()
 client.run(TOKEN)
